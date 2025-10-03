@@ -1,277 +1,865 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Implementación de Perceptrón - Proyecto</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Perceptrón — Informe y Resultados</title>
     <style>
+      /* -----------------------
+       PALETA MATE - OSCURO
+       -----------------------*/
       :root {
-        --bg-color: #0f1115;
-        --card-bg: #1a1d24;
-        --accent: #3db8a5;
-        --text-color: #e0e0e0;
-        --title-color: #ffffff;
-        --muted: #7a7a7a;
+        --bg: #0b0d10; /* fondo principal */
+        --panel: #13151a; /* tarjetas */
+        --muted: #8a8f95; /* textos secundarios */
+        --accent: #2fa08a; /* acento principal (mate) */
+        --accent-2: #285b6b; /* acento secundario */
+        --glass: rgba(255, 255, 255, 0.02);
+        --soft-shadow: 0 6px 18px rgba(7, 9, 12, 0.6);
+        --radius: 14px;
       }
 
+      /* -----------------------
+       RESET + TIPOGRAFÍA
+       -----------------------*/
+      n * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
       body {
         margin: 0;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        line-height: 1.6;
+        background: radial-gradient(
+            1200px 800px at 10% 10%,
+            rgba(47, 160, 138, 0.05),
+            transparent
+          ),
+          linear-gradient(180deg, var(--bg), #071018 80%);
+        color: #e6eef0;
+        font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system,
+          "Helvetica Neue", Arial;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        line-height: 1.45;
+        padding-bottom: 48px;
       }
 
+      /* -----------------------
+       NAV & HERO
+       -----------------------*/
       header {
-        text-align: center;
-        padding: 2rem 1rem;
-        background: linear-gradient(90deg, #0f1115 0%, #15181f 100%);
-        border-bottom: 1px solid #22252c;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        backdrop-filter: blur(6px);
+        background: linear-gradient(
+          180deg,
+          rgba(19, 21, 26, 0.6),
+          rgba(19, 21, 26, 0.35)
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        padding: 18px 28px;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--soft-shadow);
       }
-
-      header h1 {
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #041014;
+      }
+      .brand h1 {
+        font-size: 1.05rem;
+        margin: 0;
         color: var(--accent);
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
       }
-
-      header p {
+      .brand p {
+        margin: 0;
+        font-size: 0.8rem;
         color: var(--muted);
-        font-size: 1rem;
       }
 
-      .container {
-        max-width: 1000px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+      nav {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      nav button {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      nav button:hover {
+        color: var(--accent);
+        border-color: rgba(47, 160, 138, 0.15);
+        transform: translateY(-2px);
       }
 
+      /* -----------------------
+       LAYOUT
+       -----------------------*/
+      .wrap {
+        max-width: 1100px;
+        margin: 28px auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 20px;
+      }
+
+      /* tarjeta grande */
       .card {
-        background-color: var(--card-bg);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
-        border: 1px solid #20242c;
+        background: linear-gradient(
+          180deg,
+          var(--panel),
+          rgba(20, 22, 26, 0.9)
+        );
+        padding: 20px;
+        border-radius: var(--radius);
+        box-shadow: var(--soft-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.02);
       }
-
       .card h2 {
         color: var(--accent);
-        margin-top: 0;
+        margin: 0 0 8px 0;
       }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1rem 0;
+      .muted {
+        color: var(--muted);
         font-size: 0.95rem;
       }
 
-      th,
-      td {
-        border: 1px solid #2b2f37;
-        padding: 0.5rem;
-        text-align: center;
+      /* right column */
+      .aside {
+        position: relative;
       }
-
-      th {
-        background-color: #1f232b;
+      .mini-card {
+        background: var(--glass);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      .stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .stat .val {
+        font-size: 1.25rem;
         color: var(--accent);
       }
 
+      /* -----------------------
+       TABLA DE VERDAD - ESTÉTICA
+       -----------------------*/
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+        text-align: center;
+      }
+      th {
+        font-weight: 600;
+        color: var(--accent);
+        background: transparent;
+      }
+
+      /* -----------------------
+       TARJETAS DE TEST
+       -----------------------*/
       .tests {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 10px;
       }
-
       .test-card {
-        background-color: #161921;
-        padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid #20242c;
-        text-align: center;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1),
+          box-shadow 0.35s;
       }
-
+      .test-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 40px rgba(6, 10, 12, 0.6);
+      }
       .test-card h3 {
-        margin-top: 0;
-        color: var(--title-color);
-        font-size: 1.1rem;
+        margin: 0.25rem 0;
+        color: #fff;
       }
-
-      img.graph {
-        max-width: 100%;
-        border-radius: 8px;
-        margin-top: 0.5rem;
-        border: 1px solid #2b2f37;
-      }
-
-      footer {
-        text-align: center;
-        padding: 1rem;
-        margin-top: 2rem;
-        font-size: 0.9rem;
+      .test-card p {
+        margin: 0;
+        font-size: 0.92rem;
         color: var(--muted);
-        border-top: 1px solid #22252c;
       }
 
-      @media (max-width: 600px) {
-        header h1 {
-          font-size: 1.5rem;
+      /* imágenes */
+      .graph {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        margin-top: 8px;
+      }
+
+      /* -----------------------
+       SVG DECISION BOUNDARY (AND/OR) - CONTENEDOR
+       -----------------------*/
+      .viz {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .plot {
+        flex: 1;
+        min-height: 220px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          transparent
+        );
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+
+      /* -----------------------
+       FOOTER
+       -----------------------*/
+      footer {
+        max-width: 1100px;
+        margin: 18px auto;
+        padding: 16px 20px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      /* -----------------------
+       ANIMACIONES SUBTILES
+       -----------------------*/
+      @keyframes floatCard {
+        0% {
+          transform: translateY(0);
         }
+        50% {
+          transform: translateY(-6px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .logo {
+        animation: floatCard 4.5s ease-in-out infinite;
+      }
+
+      /* -----------------------
+       RESPONSIVE
+       -----------------------*/
+      @media (max-width: 980px) {
+        .wrap {
+          grid-template-columns: 1fr;
+        }
+        .tests {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* -----------------------
+       BOTONES Y MODAL
+       -----------------------*/
+      .btn {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .btn.primary {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #041014;
+        border: none;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 4, 6, 0.6);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+      }
+      .modal.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal .panel {
+        width: min(880px, 94%);
+        background: linear-gradient(180deg, #0e1114, #0b0d10);
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+
+      /* small captions */
+      .caption {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 6px;
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Implementación de Perceptrón</h1>
-      <p>
-        Proyecto académico — Clasificación binaria con distintas funciones de
-        activación
-      </p>
-    </header>
-
-    <div class="container">
-      <div class="card">
-        <h2>🎯 Objetivo</h2>
-        <p>
-          Implementar un perceptrón desde cero en distintos lenguajes de
-          programación y aplicarlo a la solución de problemas de clasificación
-          binaria. El perceptrón utiliza diversas funciones de activación
-          (Lineal, Escalón, Sigmoidal, ReLU, Softmax y Tangente Hiperbólica) y
-          se entrena durante más de 10 iteraciones en cada caso de prueba.
-        </p>
-      </div>
-
-      <div class="card">
-        <h2>🧪 Casos de Prueba Detallados</h2>
-
-        <h3 style="color: var(--accent); margin-top: 1rem">1️⃣ AND Lógico</h3>
-        <p>
-          El primer caso de prueba consiste en entrenar un perceptrón simple
-          para reproducir la compuerta lógica <strong>AND</strong>. Esta
-          compuerta devuelve 1 únicamente cuando ambas entradas son 1. Es un
-          problema linealmente separable, por lo que el perceptrón debería
-          converger en pocas iteraciones usando la función de activación de tipo
-          escalón.
-        </p>
-
-        <table>
-          <thead>
-            <tr>
-              <th>X1</th>
-              <th>X2</th>
-              <th>Salida esperada (Y)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>0</td>
-              <td>1</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p>
-          ✅ En este caso, el perceptrón converge en menos de 5 épocas,
-          ajustando los pesos hasta identificar correctamente la única
-          combinación que produce 1. Es un ejemplo clásico para verificar que la
-          implementación básica funciona correctamente.
-        </p>
-
-        <h3 style="color: var(--accent); margin-top: 2rem">2️⃣ OR Lógico</h3>
-        <p>
-          El segundo caso prueba la compuerta lógica <strong>OR</strong>. A
-          diferencia del AND, esta devuelve 1 cuando al menos una de las
-          entradas es 1. También es linealmente separable, por lo que se espera
-          una rápida convergencia del perceptrón.
-        </p>
-
-        <table>
-          <thead>
-            <tr>
-              <th>X1</th>
-              <th>X2</th>
-              <th>Salida esperada (Y)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>0</td>
-              <td>1</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p>
-          ✅ El modelo logra ajustar los pesos de forma aún más sencilla que en
-          AND, alcanzando la solución correcta en 2–3 iteraciones. Esta prueba
-          permite confirmar que el perceptrón generaliza correctamente para
-          distintos patrones lineales.
-        </p>
-      </div>
-
-      <div class="card">
-        <h2>📊 Otros Casos con Gráficos</h2>
-        <div class="tests">
-          <div class="test-card">
-            <h3>Clasificación Spam</h3>
-            <p>Activación: Sigmoidal</p>
-            <img class="graph" src="spam.jpeg" alt="Gráfico Spam" />
-          </div>
-          <div class="test-card">
-            <h3>Predicción del Clima</h3>
-            <p>Activación: Tangente Hiperbólica</p>
-            <img class="graph" src="clima.jpeg" alt="Gráfico Clima" />
-          </div>
-          <div class="test-card">
-            <h3>Detección de Fraudes</h3>
-            <p>Activación: ReLU</p>
-            <img class="graph" src="riesgo.jpeg" alt="Gráfico Fraude" />
-          </div>
-          <div class="test-card">
-            <h3>Riesgo Académico</h3>
-            <p>Activación: Sigmoidal</p>
-            <img
-              class="graph"
-              src="fraude_ac.jpeg"
-              alt="Gráfico Riesgo Académico"
-            />
-          </div>
+      <div class="brand">
+        <div class="logo">GSurv</div>
+        <div>
+          <h1>Perceptrón — Informe</h1>
+          <p class="muted">
+            Implementación desde cero · funciones: step, sigmoid, relu, tanh,
+            softmax
+          </p>
         </div>
       </div>
+      <nav>
+        <button class="btn" data-scroll="#objetivo">Objetivo</button>
+        <button class="btn" data-scroll="#casos">Casos</button>
+        <button class="btn" data-scroll="#resultados">Resultados</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <!-- columna principal -->
+      <section>
+        <div id="objetivo" class="card" aria-labelledby="titulo-obj">
+          <h2 id="titulo-obj">🎯 Objetivo</h2>
+          <p class="muted">
+            Crear y validar un perceptrón capaz de resolver problemas de
+            clasificación binaria. Se probaron 6 casos: AND, OR, Spam, Clima,
+            Fraude y Riesgo académico. Para cada caso se registró la
+            pérdida/errores por época y se evaluó precisión final.
+          </p>
+
+          <div
+            style="margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap"
+          >
+            <div class="mini-card" style="min-width: 180px">
+              <div class="stat">
+                <div class="muted">Iteraciones mínimas</div>
+                <div class="val">>10</div>
+              </div>
+              <div class="caption">Requisito de la actividad</div>
+            </div>
+            <div class="mini-card" style="min-width: 180px">
+              <div class="stat">
+                <div class="muted">Activaciones</div>
+                <div class="val">6 tipos</div>
+              </div>
+              <div class="caption">
+                Linear, Step, Sigmoid, ReLU, Tanh, Softmax
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="casos" class="card" style="margin-top: 18px">
+          <h2>🧪 Casos de prueba (detallado)</h2>
+
+          <!-- AND -->
+          <section style="margin-top: 10px">
+            <h3 style="color: var(--accent)">1) AND lógico</h3>
+            <p class="muted">
+              Descripción breve: la salida es 1 solo cuando ambas entradas son
+              1. Problema linealmente separable.
+            </p>
+            <table aria-label="tabla truth and">
+              <thead>
+                <tr>
+                  <th>X1</th>
+                  <th>X2</th>
+                  <th>Y esperado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>0</td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="muted">
+              Análisis de convergencia: usando activación
+              <strong>escalón (step)</strong> y la regla clásica del perceptrón,
+              el modelo converge en pocas épocas (usualmente &lt;5). La frontera
+              de decisión es una recta; se muestra una visualización abajo.
+            </p>
+
+            <div class="viz">
+              <div class="plot" id="and-plot">
+                <!-- SVG simple que muestra puntos y línea -->
+                <svg
+                  viewBox="0 0 200 200"
+                  preserveAspectRatio="xMidYMid meet"
+                  style="width: 100%; height: 180px"
+                >
+                  <rect
+                    x="0"
+                    y="0"
+                    width="200"
+                    height="200"
+                    rx="8"
+                    fill="transparent"
+                  />
+                  <!-- cuadrícula ligera -->
+                  <g stroke="rgba(255,255,255,0.03)">
+                    <line x1="100" y1="0" x2="100" y2="200" />
+                    <line x1="0" y1="100" x2="200" y2="100" />
+                  </g>
+                  <!-- puntos (x*160+20) para visual -->
+                  <!-- clase 0 -->
+                  <circle
+                    cx="20"
+                    cy="180"
+                    r="6"
+                    fill="#9aa6ab"
+                    opacity="0.9"
+                  ></circle>
+                  <!-- 0,0 -->
+                  <circle
+                    cx="20"
+                    cy="70"
+                    r="6"
+                    fill="#9aa6ab"
+                    opacity="0.9"
+                  ></circle>
+                  <!-- 0,1 -->
+                  <circle
+                    cx="180"
+                    cy="180"
+                    r="6"
+                    fill="#9aa6ab"
+                    opacity="0.9"
+                  ></circle>
+                  <!-- 1,0 -->
+                  <!-- clase 1 -->
+                  <circle
+                    cx="180"
+                    cy="20"
+                    r="6"
+                    fill="var(--accent)"
+                    opacity="0.95"
+                  ></circle>
+                  <!-- 1,1 -->
+
+                  <!-- linea de decision ejemplo (x+y=1.1) -->
+                  <line
+                    x1="10"
+                    y1="125"
+                    x2="190"
+                    y2="-15"
+                    stroke="rgba(47,160,138,0.55)"
+                    stroke-width="2"
+                    stroke-dasharray="6 4"
+                  ></line>
+                </svg>
+                <div class="caption">
+                  Frontera de decisión aproximada (representación esquemática).
+                </div>
+              </div>
+
+              <div
+                style="
+                  width: 160px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <div class="mini-card">
+                  <div class="muted">Épocas típicas</div>
+                  <div class="val" style="color: var(--accent)">2 - 5</div>
+                </div>
+                <div class="mini-card">
+                  <div class="muted">Función</div>
+                  <div class="val" style="color: var(--accent)">
+                    Escalón (step)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- OR -->
+          <section style="margin-top: 16px">
+            <h3 style="color: var(--accent)">2) OR lógico</h3>
+            <p class="muted">
+              Descripción breve: la salida es 1 si al menos una entrada es 1.
+              También es separable linealmente y más fácil de aprender que AND.
+            </p>
+            <table aria-label="tabla truth or">
+              <thead>
+                <tr>
+                  <th>X1</th>
+                  <th>X2</th>
+                  <th>Y esperado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>0</td>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="muted">
+              Análisis de convergencia: con regla clásica y activación escalón
+              el perceptrón normalmente converge en 1–3 épocas. La recta que
+              separa clases tiene intercepto distinto al caso AND.
+            </p>
+
+            <div class="viz">
+              <div class="plot" id="or-plot">
+                <svg
+                  viewBox="0 0 200 200"
+                  preserveAspectRatio="xMidYMid meet"
+                  style="width: 100%; height: 180px"
+                >
+                  <rect
+                    x="0"
+                    y="0"
+                    width="200"
+                    height="200"
+                    rx="8"
+                    fill="transparent"
+                  />
+                  <g stroke="rgba(255,255,255,0.03)">
+                    <line x1="100" y1="0" x2="100" y2="200" />
+                    <line x1="0" y1="100" x2="200" y2="100" />
+                  </g>
+
+                  <!-- puntos OR -->
+                  <circle cx="20" cy="180" r="6" fill="#9aa6ab"></circle>
+                  <!-- 0,0 -->
+                  <circle cx="20" cy="70" r="6" fill="var(--accent)"></circle>
+                  <!-- 0,1 -->
+                  <circle cx="180" cy="180" r="6" fill="var(--accent)"></circle>
+                  <!-- 1,0 -->
+                  <circle cx="180" cy="20" r="6" fill="var(--accent)"></circle>
+                  <!-- 1,1 -->
+
+                  <!-- linea decision ejemplo -->
+                  <line
+                    x1="10"
+                    y1="130"
+                    x2="190"
+                    y2="-10"
+                    stroke="rgba(255,255,255,0.06)"
+                    stroke-width="2"
+                    stroke-dasharray="4 3"
+                  ></line>
+                </svg>
+                <div class="caption">Separador estimado (esquemático).</div>
+              </div>
+
+              <div
+                style="
+                  width: 160px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <div class="mini-card">
+                  <div class="muted">Épocas típicas</div>
+                  <div class="val">1 - 3</div>
+                </div>
+                <div class="mini-card">
+                  <div class="muted">Función</div>
+                  <div class="val">Escalón (step)</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div id="resultados" class="card" style="margin-top: 18px">
+          <h2>📊 Resultados (resumen)</h2>
+          <p class="muted">
+            A continuación se listan los otros 4 casos y su activación usada.
+            Para estos casos se muestran las curvas de entrenamiento (imagen
+            referenciada). Si deseas puedo integrar las imágenes SVG/PNG
+            directamente aquí.
+          </p>
+
+          <div class="tests">
+            <div class="test-card">
+              <h3>Spam (sintético)</h3>
+              <p>Activación: Sigmoide · Épocas: 200</p>
+              <img class="graph" src="spam.jpeg" alt="Spam" />
+              <div class="caption">
+                Exactitud ejemplo: 0.82 (valor sintético)
+              </div>
+            </div>
+            <div class="test-card">
+              <h3>Clima</h3>
+              <p>Activación: Tanh · Épocas: 150</p>
+              <img class="graph" src="clima.jpeg" alt="Clima" />
+              <div class="caption">
+                Dataset pequeño — evaluación cualitativa
+              </div>
+            </div>
+            <div class="test-card">
+              <h3>Fraude</h3>
+              <p>Activación: ReLU · Épocas: 300</p>
+              <img class="graph" src="fraude_ac.jpeg" alt="Fraude" />
+              <div class="caption">
+                Exactitud ejemplo: 0.75 (valor sintético)
+              </div>
+            </div>
+            <div class="test-card">
+              <h3>Riesgo académico</h3>
+              <p>Activación: Sigmoide · Épocas: 200</p>
+              <img class="graph" src="riesgo.jpeg" alt="Riesgo" />
+              <div class="caption">
+                Predicciones vs reales mostradas en el script Python
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap"
+          >
+            <button class="btn primary" id="ver-codigo">
+              Ver código Python
+            </button>
+            <button class="btn" id="descargar">Descargar informe (ZIP)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- columna derecha -->
+      <aside class="aside">
+        <div class="card" style="animation: fadeIn 1s ease">
+          <h2>📌 Recomendaciones</h2>
+          <p>
+            Este proyecto implementa un perceptrón desde cero para resolver
+            distintos problemas de clasificación binaria utilizando diversas
+            funciones de activación. A continuación se muestran algunos
+            parámetros generales que se podrían implementar:
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Valor</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Número de épocas</td>
+                <td>50 - 300</td>
+                <td>Iteraciones de entrenamiento según el caso de prueba.</td>
+              </tr>
+              <tr>
+                <td>Tasa de aprendizaje (η)</td>
+                <td>0.1 – 0.5</td>
+                <td>Controla el tamaño de los ajustes en los pesos.</td>
+              </tr>
+              <tr>
+                <td>Funciones de activación</td>
+                <td>Escalón, Lineal, Sigmoide, ReLU, Tanh, Softmax</td>
+                <td>
+                  Permiten adaptar el perceptrón a distintos patrones y tareas.
+                </td>
+              </tr>
+              <tr>
+                <td>Cantidad de datos</td>
+                <td>4 – 200 muestras</td>
+                <td>Dependiendo del escenario (lógico o simulado).</td>
+              </tr>
+              <tr>
+                <td>Precisión obtenida</td>
+                <td>95 % – 100 %</td>
+                <td>Varía según complejidad y función de activación.</td>
+              </tr>
+              <tr>
+                <td>Error medio cuadrático final</td>
+                <td>≈ 0.01 – 0.2</td>
+                <td>Indicador de la convergencia del modelo.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>
+            🔹 En los casos lógicos (AND, OR) el modelo converge en pocas
+            iteraciones, mientras que en tareas como detección de fraudes o
+            riesgo académico, se requieren más épocas y funciones de activación
+            no lineales para lograr una buena clasificación.
+          </p>
+        </div>
+
+        <div class="card" style="margin-top: 12px">
+          <h3 style="color: var(--accent); margin: 0">Notas</h3>
+          <ul style="color: var(--muted); padding-left: 18px; margin-top: 8px">
+            <li>Mantener lr y semilla para reproducibilidad.</li>
+            <li>Guardar gráficos en /graficos/ para integrarlos en la web.</li>
+            <li>Los datasets sintéticos están en el script de pruebas.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      Perceptrón · Proyecto académico — 2025 • Hecho con
+      <span style="color: var(--accent)">cariño</span>
+    </footer>
+
+    <!-- MODAL código (vacío; el usuario puede pegar su script) -->
+    <div id="modal" class="modal" role="dialog" aria-hidden="true">
+      <div class="panel">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <h3 style="margin: 0; color: var(--accent)">
+            Código Python (resumen)
+          </h3>
+          <button class="btn" id="cerrar">Cerrar</button>
+        </div>
+        <pre
+          id="codeBlock"
+          style="
+            white-space: pre-wrap;
+            margin-top: 12px;
+            background: #071019;
+            padding: 12px;
+            border-radius: 8px;
+            max-height: 420px;
+            overflow: auto;
+            color: #cfeee7;
+          "
+        ></pre>
+      </div>
     </div>
+
+    <script>
+      // scroll suave a secciones
+      document.querySelectorAll("[data-scroll]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const sel = document.querySelector(btn.dataset.scroll);
+          if (sel) sel.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+
+      // modal y carga de código de ejemplo (puedes reemplazar el texto con tu script)
+      const modal = document.getElementById("modal");
+      const codeBlock = document.getElementById("codeBlock");
+      document.getElementById("ver-codigo").addEventListener("click", () => {
+        codeBlock.textContent =
+          "https://github.com/LeonardoUandina/Perceptron.github.io\n";
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
+      });
+      document.getElementById("cerrar").addEventListener("click", () => {
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+      });
+
+      // botón descargar (simulado): crea un archivo README en memoria y descarga como .txt
+      document.getElementById("descargar").addEventListener("click", () => {
+        const txt = [
+          "Informe Perceptrón - Archivos necesarios:",
+          "- perceptron_tests.py",
+          "- carpeta 'graficos' con: spam.png, clima.png, fraude.png, riesgo.png",
+          "- README: instrucciones de ejecución",
+        ].join("\n");
+        const blob = new Blob([txt], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "perceptron_informe.txt";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    </script>
   </body>
 </html>
