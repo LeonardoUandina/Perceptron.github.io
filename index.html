@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Implementación de Perceptrón - Proyecto</title>
+    <style>
+      :root {
+        --bg-color: #0f1115;
+        --card-bg: #1a1d24;
+        --accent: #3db8a5;
+        --text-color: #e0e0e0;
+        --title-color: #ffffff;
+        --muted: #7a7a7a;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      header {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(90deg, #0f1115 0%, #15181f 100%);
+        border-bottom: 1px solid #22252c;
+      }
+
+      header h1 {
+        color: var(--accent);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      header p {
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+        border: 1px solid #20242c;
+      }
+
+      .card h2 {
+        color: var(--accent);
+        margin-top: 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.95rem;
+      }
+
+      th,
+      td {
+        border: 1px solid #2b2f37;
+        padding: 0.5rem;
+        text-align: center;
+      }
+
+      th {
+        background-color: #1f232b;
+        color: var(--accent);
+      }
+
+      .tests {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .test-card {
+        background-color: #161921;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid #20242c;
+        text-align: center;
+      }
+
+      .test-card h3 {
+        margin-top: 0;
+        color: var(--title-color);
+        font-size: 1.1rem;
+      }
+
+      img.graph {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        border: 1px solid #2b2f37;
+      }
+
+      footer {
+        text-align: center;
+        padding: 1rem;
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: var(--muted);
+        border-top: 1px solid #22252c;
+      }
+
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Implementación de Perceptrón</h1>
+      <p>
+        Proyecto académico — Clasificación binaria con distintas funciones de
+        activación
+      </p>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <h2>🎯 Objetivo</h2>
+        <p>
+          Implementar un perceptrón desde cero en distintos lenguajes de
+          programación y aplicarlo a la solución de problemas de clasificación
+          binaria. El perceptrón utiliza diversas funciones de activación
+          (Lineal, Escalón, Sigmoidal, ReLU, Softmax y Tangente Hiperbólica) y
+          se entrena durante más de 10 iteraciones en cada caso de prueba.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>🧪 Casos de Prueba Detallados</h2>
+
+        <h3 style="color: var(--accent); margin-top: 1rem">1️⃣ AND Lógico</h3>
+        <p>
+          El primer caso de prueba consiste en entrenar un perceptrón simple
+          para reproducir la compuerta lógica <strong>AND</strong>. Esta
+          compuerta devuelve 1 únicamente cuando ambas entradas son 1. Es un
+          problema linealmente separable, por lo que el perceptrón debería
+          converger en pocas iteraciones usando la función de activación de tipo
+          escalón.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>X1</th>
+              <th>X2</th>
+              <th>Salida esperada (Y)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>0</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>1</td>
+              <td>1</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          ✅ En este caso, el perceptrón converge en menos de 5 épocas,
+          ajustando los pesos hasta identificar correctamente la única
+          combinación que produce 1. Es un ejemplo clásico para verificar que la
+          implementación básica funciona correctamente.
+        </p>
+
+        <h3 style="color: var(--accent); margin-top: 2rem">2️⃣ OR Lógico</h3>
+        <p>
+          El segundo caso prueba la compuerta lógica <strong>OR</strong>. A
+          diferencia del AND, esta devuelve 1 cuando al menos una de las
+          entradas es 1. También es linealmente separable, por lo que se espera
+          una rápida convergencia del perceptrón.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>X1</th>
+              <th>X2</th>
+              <th>Salida esperada (Y)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>0</td>
+              <td>1</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>0</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>1</td>
+              <td>1</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          ✅ El modelo logra ajustar los pesos de forma aún más sencilla que en
+          AND, alcanzando la solución correcta en 2–3 iteraciones. Esta prueba
+          permite confirmar que el perceptrón generaliza correctamente para
+          distintos patrones lineales.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>📊 Otros Casos con Gráficos</h2>
+        <div class="tests">
+          <div class="test-card">
+            <h3>Clasificación Spam</h3>
+            <p>Activación: Sigmoidal</p>
+            <img class="graph" src="spam.jpeg" alt="Gráfico Spam" />
+          </div>
+          <div class="test-card">
+            <h3>Predicción del Clima</h3>
+            <p>Activación: Tangente Hiperbólica</p>
+            <img class="graph" src="clima.jpeg" alt="Gráfico Clima" />
+          </div>
+          <div class="test-card">
+            <h3>Detección de Fraudes</h3>
+            <p>Activación: ReLU</p>
+            <img class="graph" src="riesgo.jpeg" alt="Gráfico Fraude" />
+          </div>
+          <div class="test-card">
+            <h3>Riesgo Académico</h3>
+            <p>Activación: Sigmoidal</p>
+            <img
+              class="graph"
+              src="fraude_ac.jpeg"
+              alt="Gráfico Riesgo Académico"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
